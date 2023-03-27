@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import reactLogo from "./assets/react.svg"
 import viteLogo from "/vite.svg"
 import "./App.css"
@@ -33,21 +33,22 @@ const imagesList = [
    "https://images.pexels.com/photos/4226881/pexels-photo-4226881.jpeg",
 ]
 function App() {
-   const [count, setCount] = useState(0)
-   const handleNext = (count) => {
-      if (count >= 3) {
-         setCount(0)
-      } else {
-         setCount(count + 1)
+   const [timeLeft, setTimeLeft] = useState(3)
+   const intervalRef = useRef() // Add a ref to store the interval id
+
+   useEffect(() => {
+      intervalRef.current = setInterval(() => {
+         setTimeLeft((t) => t - 1)
+      }, 1000)
+      return () => clearInterval(intervalRef.current)
+   }, [])
+
+   // Add a listener to `timeLeft`
+   useEffect(() => {
+      if (timeLeft < 0) {
+         setTimeLeft(3)
       }
-   }
-   const handlePrev = (count) => {
-      if (count === 0) {
-         setCount(3)
-      } else {
-         setCount(count - 1)
-      }
-   }
+   }, [timeLeft])
 
    return (
       <div
@@ -56,12 +57,9 @@ function App() {
             display: "flex",
          }}
       >
-         <button onClick={() => handlePrev(count)}>-</button>
          <div>
-            <img src={imagesList[count]} alt="image" height={400} width={500} />
+            <img src={imagesList[timeLeft]} alt="image" height={400} width={500} />
          </div>
-
-         <button onClick={() => handleNext(count)}>+</button>
       </div>
    )
 }
